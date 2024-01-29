@@ -1,0 +1,74 @@
+= CloudBees action: Scan with Sonatype Container
+
+Use this action to scan with the Sonatype Container (previously known as Nexus Container) scanner, which identifies code vulnerabilities and compliance issues.
+
+== Inputs
+
+[cols="2a,1a,1a,3a",options="header"]
+.Input details
+|===
+
+| Input name
+| Data type
+| Required?
+| Description
+
+| `server-url`
+| String
+| Yes
+| The Sonatype server URL.
+
+| `username`
+| String
+| Yes
+| The Sonatype username.
+
+| `password`
+| String
+| Yes
+| The Sonatype password.
+
+| `token`
+| String
+| Yes
+| The Sonatype token.
+
+| `image-location`
+| String
+| Yes
+| The container image location.
+
+| `image-tag`
+| String
+| Yes
+| The container image tag.
+
+|===
+
+== Usage example
+
+In your YAML file, add:
+
+[source,yaml]
+----
+
+      - name: Scan with Sonatype Container
+        uses: cloudbees-io/nexusiq-scan-container@v1
+        with:
+          username: "sonatype_username"
+          password: ${{ secrets.SONATYPE_PASSWORD }}
+          token: ${{ secrets.SONATYPE_TOKEN }}
+          image-location: ${{ vars.SONATYPE_ASSET_IDENTIFIER }}
+          image-tag: ${{ vars.SONATYPE_PROFILE_IDENTIFIER }}
+
+----
+
+== License
+
+This code is made available under the 
+link:https://opensource.org/license/mit/[MIT license].
+
+== References
+
+* Learn more about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform-actions/latest/[using actions in CloudBees workflows].
+* Learn about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform/latest/[the CloudBees platform].
