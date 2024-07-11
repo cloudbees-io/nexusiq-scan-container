@@ -19,7 +19,7 @@ runs:
   steps:
     - id: nexusiq-binary
       name: nexusiq
-      uses: docker://public.ecr.aws/l7o7z1g8/actions/nexusiq-actions:main-89aedd1a063b0186c83011877285af4795e54167
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/nexusiq-actions:main-393c33e0f2d02c2b0f2c1b5da82f4fc6c21aa65f
       shell: bash
       env:
         RUN_ID: ${{ cloudbees.run_id }}
