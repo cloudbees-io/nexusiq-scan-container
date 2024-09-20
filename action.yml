@@ -8,7 +8,7 @@ inputs:
     required: true
   password:
     required: true
-  token:
+  org-id:
     required: true
   image-location:
     required: true
@@ -17,9 +17,23 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: skopeo
+      uses: docker://public.ecr.aws/logistics/quay.io/skopeo/stable:v1.10
+      shell: bash
+      env:
+        BINARY_IMAGE_NAME: "nexusiq_binary_asset.tar"
+      run: | 
+          set -x
+          skopeo -v
+          cd /
+          if [ -f $CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME ]; then
+               rm $CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME
+          fi
+          skopeo copy --insecure-policy docker://${{ inputs.image-location }}:${{ inputs.image-tag }} docker-archive:$CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME:${{ inputs.image-location }}:${{ inputs.image-tag }} --dest-oci-accept-uncompressed-layers
+          ls -ltr $CLOUDBEES_WORKSPACE
     - id: nexusiq-binary
       name: nexusiq
-      uses: docker://public.ecr.aws/l7o7z1g8/actions/nexusiq-actions:main-393c33e0f2d02c2b0f2c1b5da82f4fc6c21aa65f
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/nexusiq-actions:main-f9078838c0c61bf32f391fcbe77169fb68e69b34
       shell: bash
       env:
         RUN_ID: ${{ cloudbees.run_id }}
@@ -28,18 +42,13 @@ runs:
         DNS_URL: ${{ cloudbees.api.url }}
         JWT_TOKEN: ${{ cloudbees.api.token }} 
         BINARY_IMAGE_NAME: "nexusiq_binary_asset.tar"
-        CONFIG_JSON: '{\"metaInfo\":{\"url\":\"${{ inputs.server-url }}\",\"username\":\"${{ inputs.username }}\",\"password\":\"${{ inputs.password }}\",\"client_secret\":\"${{ inputs.token }}\",\"toolName\":\"nexusiq\"},\"orchestratorInfo\":{\"assetType\":\"BINARY\",\"assetIdentifier\":\"${{ inputs.image-location }}\",\"profileIdentifier\":\"${{ inputs.image-tag }}\",\"sourceType\":\"SAAS\"},\"metaInformation\":{\"actor\":\"NA\",\"commit_id\":\"NA\",\"tenent_info\":\"NA\",\"scanner_type\":\"Container\"}}'
+        CONFIG_JSON: '{\"metaInfo\":{\"url\":\"${{ inputs.server-url }}\",\"username\":\"${{ inputs.username }}\",\"password\":\"${{ inputs.password }}\",\"client_secret\":\"${{ inputs.org-id }}\",\"toolName\":\"nexusiq\"},\"orchestratorInfo\":{\"assetType\":\"BINARY\",\"assetIdentifier\":\"${{ inputs.image-location }}\",\"profileIdentifier\":\"${{ inputs.image-tag }}\",\"sourceType\":\"SAAS\"},\"metaInformation\":{\"actor\":\"NA\",\"commit_id\":\"NA\",\"tenent_info\":\"NA\",\"scanner_type\":\"Container\"}}'
       run: |
         set -x
         echo "RUN ID: ${{ cloudbees.run_id }}"
         echo "Job ID: ${{ job.id }}"
         echo "Step ID: ${{ step.internal.id }}"
         cd /
-        if [ -f $CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME ]; then
-          rm $CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME
-        fi
-        # crane flatten ${{ inputs.image-location }}:${{ inputs.image-tag }}
-        skopeo copy docker://${{ inputs.image-location }}:${{ inputs.image-tag }} docker-archive:$CLOUDBEES_WORKSPACE/$BINARY_IMAGE_NAME:${{ inputs.image-location }}:${{ inputs.image-tag }}
         cd /app/
         /bin/bash -c "java -jar /app/nexus-iq-server.jar & while ! nc -z localhost 5001; do sleep 1; done && /app/orchestrator -scanConfig \"${CONFIG_JSON}\" execute-analyser && exit"
 
