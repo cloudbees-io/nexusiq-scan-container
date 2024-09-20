@@ -28,10 +28,10 @@ Use this action to scan with the Sonatype Container (previously known as Nexus C
 | Yes
 | The Sonatype password.
 
-| `token`
+| `org-id`
 | String
 | Yes
-| The Sonatype token.
+| The Sonatype Org-ID.
 
 | `image-location`
 | String
@@ -57,7 +57,7 @@ In your YAML file, add:
         with:
           username: "sonatype_username"
           password: ${{ secrets.SONATYPE_PASSWORD }}
-          token: ${{ secrets.SONATYPE_TOKEN }}
+          token: ${{ secrets.SONATYPE_ORG_ID }}
           image-location: ${{ vars.SONATYPE_ASSET_IDENTIFIER }}
           image-tag: ${{ vars.SONATYPE_PROFILE_IDENTIFIER }}
 
