@@ -18,7 +18,8 @@ runs:
   using: composite
   steps:
     - name: skopeo
-      uses: docker://public.ecr.aws/logistics/quay.io/skopeo/stable:v1.10
+      # uses: docker://public.ecr.aws/logistics/quay.io/skopeo/stable:v1.10
+      uses: docker://uses: docker://020229604682.dkr.ecr.us-east-1.amazonaws.com/actions/nexusiq-actions:main-240d030d13f4b9ca3dab1bca3d4801fdba11a7ba
       shell: bash
       env:
         BINARY_IMAGE_NAME: "nexusiq_binary_asset.tar"
